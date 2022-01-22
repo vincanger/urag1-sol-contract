@@ -22,10 +22,11 @@ contract NFTcontract is ERC721URIStorage {
     console.log("You Are a Good One");
   }
 
+  event NewNFTMinted(address sender, uint256 tokenId);
+
   function makeNFT(string memory _metadata, uint8 v, bytes32 r, bytes32 s) public {
     require(verifyString(_metadata, v, r, s), "NOT SIGNED CORRECTLY!");
     
-     // Get the current tokenId, this starts at 0.
     uint256 newItemId = _tokenIds.current();
     string memory numberStr = Strings.toString(_tokenIds.current());
     string memory finalSvg = string(abi.encodePacked(baseSvg, _metadata, '<tspan> #', numberStr, '</tspan></text></svg>'));
@@ -47,9 +48,8 @@ contract NFTcontract is ERC721URIStorage {
         abi.encodePacked('data:application/json;base64,', json)
     );
 
-    console.log("\n--------------------");
-    console.log(finalTokenUri);
-    console.log("--------------------\n");
+    console.log("::::: \n", finalTokenUri);
+    console.log("::::: \n");
 
      // Actually mint the NFT to the sender using msg.sender.
     _safeMint(msg.sender, newItemId);
@@ -61,7 +61,7 @@ contract NFTcontract is ERC721URIStorage {
 
     // Increment the counter for when the next NFT is minted.
     _tokenIds.increment();
-    finalSvg = '';
+    emit NewNFTMinted(msg.sender, newItemId);
   }
 
   // Returns the address that signed a given string message
